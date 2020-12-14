@@ -1,0 +1,34 @@
+<html>
+<body>
+
+<script>
+	function createElement(tag, content, parent){
+		var el = document.createElement(tag)
+		el.appendChild(document.createTextNode(content))
+		parent == null ? document.body.append(el): parent.appendChild(el)
+	}
+	questionCount = 1
+	var dump = prompt("JSON test dump")
+	JSON.parse(dump).forEach(x=>{
+		questionDiv = document.createElement('div')
+		document.body.append(questionDiv)
+		question = questionCount + '. '+x.question
+		questionCount ++ 
+		createElement('h2', question, questionDiv)
+		choices = x.choices.forEach(c=>{
+			createElement('li', c, questionDiv)
+		})
+		// highlight correct choice 
+		x.answer.forEach(a=>{
+			Array.from(questionDiv.getElementsByTagName('li')).forEach(c=>{
+				if (c.innerText.includes(a)){
+					c.style.color = 'green'
+				}
+			})
+		})
+
+
+	})
+</script>
+</body>	
+</html>
