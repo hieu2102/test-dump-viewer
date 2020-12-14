@@ -5,6 +5,9 @@
 			background-color: black;
 			color:white;
 		}
+		.correctAnswer{
+			color:green
+		}
 	</style>
 </head>
 <body>
@@ -19,6 +22,7 @@
 	var dump = prompt("JSON test dump")
 	JSON.parse(dump).forEach(x=>{
 		questionDiv = document.createElement('div')
+		questionDiv.className = 'question'
 		document.body.append(questionDiv)
 		question = questionCount + '. '+x.question
 		questionCount ++ 
@@ -30,7 +34,7 @@
 		x.answer.forEach(a=>{
 			Array.from(questionDiv.getElementsByTagName('li')).forEach(c=>{
 				if (c.innerText.includes(a)){
-					c.style.color = 'green'
+					c.className = 'correctAnswer'
 				}
 			})
 		})
