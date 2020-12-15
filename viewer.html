@@ -15,8 +15,32 @@
 <script>
 	function createElement(tag, content, parent){
 		var el = document.createElement(tag)
+		if (tag == 'li'){
+			checkbox = document.createElement('input')
+			checkbox.type  ='checkbox'
+			el.appendChild(checkbox)
+		}
 		el.appendChild(document.createTextNode(content))
 		parent == null ? document.body.append(el): parent.appendChild(el)
+	}
+	function getChoiceKey(choiceElement){
+		return choiceElement.innerText.split(' ', 1)
+	}
+	function getSubmittedAnswers(){
+		questions = Array.from(document.getElementsByClassName('question'));
+		answers = []
+		questions.forEach(q=>{
+			ans = []
+			qText = q.getElementsByTagName('h2').innerText
+			qChoices = Array.from(q.getElementsByTagName('li')).map(x=>{
+				if (x.getElementsByTagName('input')[0].checked){
+					ans.push(getChoiceKey(x));
+				}
+				return x.innerText;
+			})
+			answers.push({'question':qText, 'choices':qChoices, 'answer':ans});
+		})
+		console.log(JSON.stringify(answers));
 	}
 	questionCount = 1
 	var dump = prompt("JSON test dump")
@@ -35,11 +59,18 @@
 			Array.from(questionDiv.getElementsByTagName('li')).forEach(c=>{
 				if (c.innerText.includes(a)){
 					c.className = 'correctAnswer'
+					c.getElementsByTagName('input')[0].checked = true;
 				}
 			})
 		})
-
-
+	})
+	document.body.append(document.createElement('br'));
+	submit = document.createElement('input')
+	submit.type = 'submit'
+	submit.id = 'updateDump'
+	document.body.append(submit)
+	document.getElementById('updateDump').addEventListener('click', ()=>{
+		getSubmittedAnswers()
 	})
 </script>
 </body>	
