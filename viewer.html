@@ -10,7 +10,7 @@
 		}
 	</style>
 </head>
-<body onload= "getExamData()">
+<body>
 
 <script>
 	function createElement(tag, content, parent){
@@ -31,9 +31,7 @@
 		answers = []
 		questions.forEach(q=>{
 			ans = []
-			qText = q.getElementsByTagName('h2')[0].innerText;
-			regex = new RegExp("[1-9]+\\. ");
-			qText = qText.split(regex).pop()
+			qText = q.getElementsByTagName('h2').innerText
 			qChoices = Array.from(q.getElementsByTagName('li')).map(x=>{
 				if (x.getElementsByTagName('input')[0].checked){
 					ans.push(getChoiceKey(x));
@@ -41,71 +39,39 @@
 				return x.innerText;
 			})
 			answers.push({'question':qText, 'choices':qChoices, 'answer':ans});
-		});
-		examCode = document.getElementsByTagName('h1')[0].innerText;
-		requestBody = {"code": examCode, "content":answers}
-		requestOptions = {
-			headers:{
-				      'Accept': 'application/json',
-				      'Content-Type': 'application/json'
-			},
-			method: "PUT",
-			body:JSON.stringify(requestBody)
-		};
-		fetch("http://localhost:8080/update", requestOptions)
-		.then(function(res){location.reload()})
-
+		})
+		console.log(JSON.stringify(answers));
 	}
-	function getExamData(){
-		fetch('http://localhost:8080/examList').then(response => response.json())
-		.then((data)=>{
-			examNames = data.map(x=>{
-				return x.name;
-			});
-			promptString = examNames.join('\n');
-			chosenExam = prompt(promptString);
-			exam = data.find(x=>{
-				if (x.name === chosenExam){
-					return x.code;
+	questionCount = 1
+	var dump = prompt("JSON test dump")
+	JSON.parse(dump).forEach(x=>{
+		questionDiv = document.createElement('div')
+		questionDiv.className = 'question'
+		document.body.append(questionDiv)
+		question = questionCount + '. '+x.question
+		questionCount ++ 
+		createElement('h2', question, questionDiv)
+		choices = x.choices.forEach(c=>{
+			createElement('li', c, questionDiv)
+		})
+		// highlight correct choice 
+		x.answer.forEach(a=>{
+			Array.from(questionDiv.getElementsByTagName('li')).forEach(c=>{
+				if (c.innerText.includes(a)){
+					c.className = 'correctAnswer'
+					c.getElementsByTagName('input')[0].checked = true;
 				}
 			})
-			url = 'http://localhost:8080/dump/'+exam.code;
-			fetch(url).then(response=> response.json())
-			.then((data)=>{
-				data = data.pop()
-				questionCount = 1
-				createElement('h1', data.code, null);
-				data.content.forEach(x=>{
-					questionDiv = document.createElement('div');
-					questionDiv.className = 'question';
-					document.body.append(questionDiv);
-					var question = questionCount + '. ' +x.question;
-					questionCount ++ 
-					createElement('h2', question, questionDiv)
-					choices = x.choices.forEach(c=>{
-					createElement('li', c, questionDiv)
-					})
-
-					x.answer.forEach(a=>{
-						Array.from(questionDiv.getElementsByTagName('li')).forEach(c=>{
-							if (c.innerText.includes(a)){
-								c.className = 'correctAnswer';
-								c.getElementsByTagName('input')[0].checked = true;
-							}
-						})
-					})					
-				})
-				document.body.append(document.createElement('br'));
-				submit = document.createElement('input')
-				submit.type = 'submit'
-				submit.id = 'updateDump'
-				document.body.append(submit)
-				document.getElementById('updateDump').addEventListener('click', ()=>{
-					getSubmittedAnswers()
-				})
-			})
-		});
-	}
+		})
+	})
+	document.body.append(document.createElement('br'));
+	submit = document.createElement('input')
+	submit.type = 'submit'
+	submit.id = 'updateDump'
+	document.body.append(submit)
+	document.getElementById('updateDump').addEventListener('click', ()=>{
+		getSubmittedAnswers()
+	})
 </script>
 </body>	
 </html>
