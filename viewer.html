@@ -32,8 +32,8 @@
 		questions.forEach(q=>{
 			ans = []
 			qText = q.getElementsByTagName('h2')[0].innerText;
-			regex = new RegExp("[1-9]+\\. ");
-			qText = qText.split(regex).pop()
+			regex = new RegExp("[0-9]+\\.");
+			qText = qText.split(regex).pop().trim()
 			qChoices = Array.from(q.getElementsByTagName('li')).map(x=>{
 				if (x.getElementsByTagName('input')[0].checked){
 					ans.push(getChoiceKey(x));
@@ -53,7 +53,7 @@
 			body:JSON.stringify(requestBody)
 		};
 		fetch("http://localhost:8080/update", requestOptions)
-		.then(function(res){location.reload()})
+		.then(function(res){console.log(res.json())})
 
 	}
 	function getExamData(){
@@ -95,14 +95,19 @@
 						})
 					})					
 				})
-				document.body.append(document.createElement('br'));
-				submit = document.createElement('input')
-				submit.type = 'submit'
-				submit.id = 'updateDump'
-				document.body.append(submit)
-				document.getElementById('updateDump').addEventListener('click', ()=>{
-					getSubmittedAnswers()
-				})
+				Array.from(document.getElementsByTagName('input')).forEach(c=>{
+					c.addEventListener('click', ()=>{
+						getSubmittedAnswers();
+					});
+				});
+				// document.body.append(document.createElement('br'));
+				// submit = document.createElement('input')
+				// submit.type = 'submit'
+				// submit.id = 'updateDump'
+				// document.body.append(submit)
+				// document.getElementById('updateDump').addEventListener('click', ()=>{
+				// 	getSubmittedAnswers()
+				// })
 			})
 		});
 	}
